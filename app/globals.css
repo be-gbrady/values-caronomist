@@ -1,0 +1,375 @@
+@import "tailwindcss";
+
+:root {
+  --navy: #0B1F3B;
+  --yellow: #F7C948;
+  --navy-light: #122848;
+  --navy-mid: #1a3456;
+  --border: rgba(247, 201, 72, 0.15);
+  --text-muted: #94a3b8;
+  --background: #0B1F3B;
+  --foreground: #f1f5f9;
+}
+
+body {
+  background: var(--navy);
+  color: var(--foreground);
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+@theme inline {
+  --color-navy: #0B1F3B;
+  --color-yellow: #F7C948;
+  --font-sans: var(--font-inter);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--navy);
+}
+::-webkit-scrollbar-thumb {
+  background: #1e3a5f;
+  border-radius: 3px;
+}
+
+/* Score bar animations */
+.score-bar {
+  transition: width 0.6s ease;
+}
+
+/* Row hover */
+.rank-row:hover {
+  background: rgba(247, 201, 72, 0.04);
+}
+
+/* Tab active */
+.tab-active {
+  color: #F7C948;
+  border-bottom: 2px solid #F7C948;
+}
+
+.tab-inactive {
+  color: #64748b;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-inactive:hover {
+  color: #94a3b8;
+}
+
+/* ============================================================
+   Portfolio Tracker Styles
+   ============================================================ */
+
+/* Form */
+.portfolio-form {
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.form-select,
+.form-input,
+.form-textarea {
+  background: #0d2744;
+  border: 1px solid rgba(247, 201, 72, 0.15);
+  border-radius: 6px;
+  color: #f1f5f9;
+  font-size: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.form-select:focus,
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: rgba(247, 201, 72, 0.5);
+}
+
+.form-select:disabled,
+.form-input:disabled,
+.form-textarea:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.form-select option {
+  background: #0d2744;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-error {
+  color: #f87171;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.model-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(247, 201, 72, 0.05);
+  border-radius: 6px;
+  border: 1px solid rgba(247, 201, 72, 0.1);
+  font-size: 0.85rem;
+}
+
+.preview-label {
+  color: #94a3b8;
+}
+
+.preview-value {
+  color: var(--yellow);
+  font-weight: 600;
+}
+
+.preview-trend {
+  font-size: 0.8rem;
+}
+
+.limit-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  color: #fca5a5;
+  margin-bottom: 1rem;
+}
+
+.add-btn {
+  margin-top: 1rem;
+  background: var(--yellow);
+  color: #0B1F3B;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.add-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.add-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Tier status bar */
+.tier-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  padding: 0.6rem 1rem;
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+}
+
+/* Portfolio list */
+.portfolio-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #64748b;
+}
+
+.portfolio-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.summary-item {
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.summary-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.vehicle-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vehicle-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  transition: border-color 0.15s;
+}
+
+.vehicle-row:hover {
+  border-color: rgba(247, 201, 72, 0.3);
+}
+
+.vr-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.vr-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #f1f5f9;
+}
+
+.vr-year {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.vr-meta {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vr-values {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.vr-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+
+.col-label {
+  font-size: 0.7rem;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.col-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  white-space: nowrap;
+}
+
+.vr-remove {
+  background: none;
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  color: #f87171;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.vr-remove:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.portfolio-chart-wrap {
+  margin-top: 1.5rem;
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+.chart-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .portfolio-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .vr-values {
+    gap: 0.75rem;
+  }
+  .tier-status-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
