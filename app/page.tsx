@@ -436,6 +436,10 @@ export default function Home() {
               Start Free Trial
             </button>
           </div>
+          <div className="mt-6 border-t border-white/5 pt-4 text-xs text-slate-600">
+            © 2026 Brady Commerce LLC. All rights reserved.
+            <span className="block">Caronomist Values is a Brady Commerce digital media property.</span>
+          </div>
         </div>
       </div>
     </div>
