@@ -16,6 +16,7 @@
  */
 
 import { useState } from "react";
+import { isBillingEnabled } from "@/lib/billing";
 import { OVERALL_RANKING, RankedModel, formatCurrency } from "../lib/rankingData";
 
 export type AlertType = "above" | "below" | "change";
@@ -120,7 +121,11 @@ export default function PriceAlertForm({
       return;
     }
     if (atLimit) {
-      setError(`Pro+ alert limit (${PRO_PLUS_ALERT_LIMIT}) reached. Delete an alert to add a new one.`);
+      setError(
+        isBillingEnabled()
+          ? `Pro+ alert limit (${PRO_PLUS_ALERT_LIMIT}) reached. Delete an alert to add a new one.`
+          : `Alert limit (${PRO_PLUS_ALERT_LIMIT}) reached. Delete an alert to add a new one.`
+      );
       return;
     }
 
@@ -192,19 +197,21 @@ export default function PriceAlertForm({
         <h3 style={{ margin: 0, color: "#fff", fontSize: 18 }}>
           Create Price Alert
         </h3>
-        <span
-          style={{
-            marginLeft: "auto",
-            background: "#a78bfa22",
-            color: "#a78bfa",
-            borderRadius: 20,
-            padding: "2px 10px",
-            fontSize: 12,
-            fontWeight: 600,
-          }}
-        >
-          Pro+
-        </span>
+        {isBillingEnabled() && (
+          <span
+            style={{
+              marginLeft: "auto",
+              background: "#a78bfa22",
+              color: "#a78bfa",
+              borderRadius: 20,
+              padding: "2px 10px",
+              fontSize: 12,
+              fontWeight: 600,
+            }}
+          >
+            Pro+
+          </span>
+        )}
       </div>
 
       {atLimit && (

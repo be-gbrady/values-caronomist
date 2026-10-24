@@ -14,6 +14,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { isBillingEnabled } from "@/lib/billing";
 import { TierGate, type AccessTier } from "../../../components/TierGate";
 import { PortfolioForm } from "../../../components/PortfolioForm";
 import {
@@ -110,20 +111,23 @@ export default function PortfolioPage() {
             color: "#f1f5f9",
           }}
         >
-          Portfolio Tracker{" "}
-          <span
-            style={{
-              fontSize: "0.75rem",
-              background: "var(--yellow)",
-              color: "#0B1F3B",
-              padding: "2px 8px",
-              borderRadius: 999,
-              fontWeight: 700,
-              verticalAlign: "middle",
-            }}
-          >
-            PRO
-          </span>
+          Portfolio Tracker
+          {isBillingEnabled() && (
+            <span
+              style={{
+                fontSize: "0.75rem",
+                background: "var(--yellow)",
+                color: "#0B1F3B",
+                padding: "2px 8px",
+                borderRadius: 999,
+                fontWeight: 700,
+                verticalAlign: "middle",
+                marginLeft: "0.5rem",
+              }}
+            >
+              PRO
+            </span>
+          )}
         </h1>
         <p style={{ color: "#94a3b8", marginTop: "0.5rem", fontSize: "0.9rem" }}>
           Track your collector car collection against live market values. See your
@@ -141,7 +145,7 @@ export default function PortfolioPage() {
           {/* Tier badge */}
           <div className="tier-status-bar">
             <span>
-              {tier === "free" && (
+              {tier === "free" && isBillingEnabled() && (
                 <>
                   <span style={{ color: "var(--yellow)" }}>Free tier</span> — tracking up to 3 vehicles.{" "}
                   <a href="/checkout/pro" style={{ color: "var(--yellow)", textDecoration: "underline" }}>
@@ -150,7 +154,8 @@ export default function PortfolioPage() {
                   for 10 vehicles + full score access.
                 </>
               )}
-              {tier === "pro" && (
+              {tier === "free" && !isBillingEnabled() && <>Tracking up to 3 vehicles.</>}
+              {tier === "pro" && isBillingEnabled() && (
                 <>
                   <span style={{ color: "var(--yellow)" }}>Pro</span> — tracking up to 10 vehicles.{" "}
                   <a href="/checkout/pro-plus" style={{ color: "#a78bfa", textDecoration: "underline" }}>
@@ -159,11 +164,13 @@ export default function PortfolioPage() {
                   for unlimited tracking + custom alerts.
                 </>
               )}
-              {tier === "pro+" && (
+              {tier === "pro" && !isBillingEnabled() && <>Tracking up to 10 vehicles.</>}
+              {tier === "pro+" && isBillingEnabled() && (
                 <>
                   <span style={{ color: "#a78bfa" }}>Pro+</span> — unlimited vehicle tracking. Full access.
                 </>
               )}
+              {tier === "pro+" && !isBillingEnabled() && <>Unlimited vehicle tracking.</>}
             </span>
             <span style={{ color: "#475569", fontSize: "0.8rem" }}>
               {entries.length} / {limit === -1 ? "∞" : limit} vehicles

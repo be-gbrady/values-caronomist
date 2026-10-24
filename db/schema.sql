@@ -217,7 +217,7 @@ CREATE TABLE audit_log (
   entity_type VARCHAR(50) NOT NULL,          -- "vehicle", "valuation", "specification"
   entity_id UUID NOT NULL,
   action VARCHAR(50) NOT NULL,               -- "create", "update", "verify", "import"
-  performed_by VARCHAR(100),                 -- "Kion", "Orion", "George", "import_script"
+  performed_by VARCHAR(100),                 -- operator handle or "import_script"
   source_url TEXT,
   notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

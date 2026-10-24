@@ -10,7 +10,7 @@ export default function AdminAnalyticsPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const ADMIN_KEY = process.env.NEXT_PUBLIC_ADMIN_KEY || "brady2026";
+  const adminKey = process.env.NEXT_PUBLIC_ADMIN_KEY;
 
   useEffect(() => {
     const stored = typeof window !== "undefined" && localStorage.getItem("caronomist_admin");
@@ -19,12 +19,12 @@ export default function AdminAnalyticsPage() {
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (password === ADMIN_KEY) {
+    if (adminKey && password === adminKey) {
       localStorage.setItem("caronomist_admin", "true");
       setIsAdmin(true);
       setError("");
     } else {
-      setError("Incorrect password.");
+      setError(adminKey ? "Incorrect password." : "Admin access is not configured.");
     }
   }
 
@@ -94,8 +94,8 @@ export default function AdminAnalyticsPage() {
             </button>
           </form>
           <p style={{ textAlign: "center", fontSize: "0.72rem", color: "#334155", marginTop: "1.25rem" }}>
-            Set NEXT_PUBLIC_ADMIN_KEY env var before production deploy.<br />
-            Replace with Memberstack admin plan for multi-user access.
+            Admin access requires NEXT_PUBLIC_ADMIN_KEY.<br />
+            Replace with a server-side session check before production use.
           </p>
         </div>
       </div>

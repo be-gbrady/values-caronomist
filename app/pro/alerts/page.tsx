@@ -8,6 +8,7 @@
  */
 
 import { useState } from "react";
+import { isBillingEnabled } from "@/lib/billing";
 import { TierGate } from "../../../components/TierGate";
 import PriceAlertForm from "../../../components/PriceAlertForm";
 import PriceAlertList from "../../../components/PriceAlertList";
@@ -100,11 +101,17 @@ export default function AlertsPage() {
                   title: "Pause or delete anytime",
                   desc: "Travelling or not ready to act? Pause any alert without losing it. Delete when you've made your move.",
                 },
-                {
-                  icon: "🎯",
-                  title: "Up to 20 alerts (Pro+)",
-                  desc: "Pro+ members can track up to 20 vehicle models simultaneously. Pro members: upgrade to Pro+ for alert access.",
-                },
+                isBillingEnabled()
+                  ? {
+                      icon: "🎯",
+                      title: "Up to 20 alerts (Pro+)",
+                      desc: "Pro+ members can track up to 20 vehicle models simultaneously. Pro members: upgrade to Pro+ for alert access.",
+                    }
+                  : {
+                      icon: "🎯",
+                      title: "Up to 20 alerts",
+                      desc: "Track up to 20 vehicle models at the same time.",
+                    },
               ].map(({ icon, title, desc }) => (
                 <div key={title} style={{ display: "flex", gap: 12 }}>
                   <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>

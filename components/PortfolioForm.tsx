@@ -17,6 +17,7 @@
  */
 
 import { useState } from "react";
+import { isBillingEnabled } from "@/lib/billing";
 import { OVERALL_RANKING } from "../lib/rankingData";
 import type { PortfolioEntry } from "./PortfolioList";
 
@@ -77,11 +78,16 @@ export function PortfolioForm({ entries, tierLimit, onAdd }: PortfolioFormProps)
         <div className="limit-banner">
           <span>🔒</span>
           <span>
-            You&apos;ve reached your {tierLimit}-car limit.{" "}
-            <a href="/checkout/pro" style={{ color: "var(--yellow)", textDecoration: "underline" }}>
-              Upgrade to Pro
-            </a>{" "}
-            for up to 10 cars.
+            You&apos;ve reached your {tierLimit}-car limit.
+            {isBillingEnabled() && (
+              <>
+                {" "}
+                <a href="/checkout/pro" style={{ color: "var(--yellow)", textDecoration: "underline" }}>
+                  Upgrade to Pro
+                </a>{" "}
+                for up to 10 cars.
+              </>
+            )}
           </span>
         </div>
       )}

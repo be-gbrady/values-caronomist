@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { isBillingEnabled } from "@/lib/billing";
 
 export type ExportFormat = "csv" | "json";
 export type ExportDataset = "rankings" | "portfolio" | "alerts";
@@ -54,7 +55,11 @@ export function ExportPanel({ userTier = "none", userEmail = "" }: ExportPanelPr
     const option = EXPORT_OPTIONS.find((o) => o.dataset === selectedDataset);
     if (!option) return;
     if (!canExport(option)) {
-      setError(`This export requires ${option.requiresTier} tier. Upgrade to access.`);
+      setError(
+        isBillingEnabled()
+          ? `This export requires ${option.requiresTier} tier. Upgrade to access.`
+          : "This export is not available yet."
+      );
       return;
     }
 
@@ -130,23 +135,28 @@ export function ExportPanel({ userTier = "none", userEmail = "" }: ExportPanelPr
                   <span className={`font-semibold ${accessible ? "text-white" : "text-gray-500"}`}>
                     {option.label}
                   </span>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full border ${
-                      option.requiresTier === "pro+"
-                        ? "text-purple-400 border-purple-400/30 bg-purple-400/10"
-                        : "text-yellow-400 border-yellow-400/30 bg-yellow-400/10"
-                    }`}
-                  >
-                    {option.requiresTier.toUpperCase()}
-                  </span>
+                  {isBillingEnabled() && (
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded-full border ${
+                        option.requiresTier === "pro+"
+                          ? "text-purple-400 border-purple-400/30 bg-purple-400/10"
+                          : "text-yellow-400 border-yellow-400/30 bg-yellow-400/10"
+                      }`}
+                    >
+                      {option.requiresTier.toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 <p className={`text-sm ${accessible ? "text-gray-400" : "text-gray-600"}`}>
                   {option.description}
                 </p>
-                {!accessible && (
+                {!accessible && isBillingEnabled() && (
                   <p className="text-xs text-purple-400 mt-1">
                     Upgrade to {option.requiresTier} to unlock →
                   </p>
+                )}
+                {!accessible && !isBillingEnabled() && (
+                  <p className="text-xs text-gray-500 mt-1">Not available yet</p>
                 )}
               </button>
             );

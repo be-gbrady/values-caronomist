@@ -28,9 +28,18 @@ export async function generateMetadata({
   const { modelCode } = await params;
   const vehicle = getVehicleDetail(slugToModelCode(modelCode));
   if (!vehicle) return { title: "Vehicle Not Found — Caronomist" };
+  const slug = modelCodeToSlug(vehicle.modelCode);
+  const title = `${vehicle.make} ${vehicle.model} (${vehicle.generation}) — Caronomist Values`;
+  const description = `Collector car valuation, price bands, buyer's guide, and ranking for the ${vehicle.yearRange} ${vehicle.make} ${vehicle.model} ${vehicle.generation}. Ranked #${vehicle.ranking.rank} of 21.`;
   return {
-    title: `${vehicle.make} ${vehicle.model} (${vehicle.generation}) — Caronomist Values`,
-    description: `Collector car valuation, price bands, buyer's guide, and ranking for the ${vehicle.yearRange} ${vehicle.make} ${vehicle.model} ${vehicle.generation}. Ranked #${vehicle.ranking.rank} of 21.`,
+    title,
+    description,
+    alternates: { canonical: `/vehicles/${slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/vehicles/${slug}`,
+    },
   };
 }
 

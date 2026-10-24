@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { isBillingEnabled } from "@/lib/billing";
 import { ExportPanel } from "@/components/ExportPanel";
 import { TierGate } from "@/components/TierGate";
 
@@ -50,9 +51,11 @@ export default function ExportPage() {
           </Link>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-3xl font-bold tracking-tight">Data Export</h1>
-            <span className="text-xs px-2 py-0.5 rounded-full border border-yellow-400/30 bg-yellow-400/10 text-yellow-400 uppercase tracking-wider">
-              Pro+
-            </span>
+            {isBillingEnabled() && (
+              <span className="text-xs px-2 py-0.5 rounded-full border border-yellow-400/30 bg-yellow-400/10 text-yellow-400 uppercase tracking-wider">
+                Pro+
+              </span>
+            )}
           </div>
           <p className="text-gray-400">
             Download your rankings, portfolio, and price alerts as CSV or JSON.

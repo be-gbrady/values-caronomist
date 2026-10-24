@@ -16,7 +16,7 @@
  *   - File-based audit log fallback when DATABASE_URL not configured
  *   - Zero hard dependencies beyond stripe SDK + Node built-ins
  *
- * Setup (George — 2 min):
+ * Setup:
  *   1. stripe listen --forward-to localhost:3000/api/webhooks/stripe  (dev)
  *   2. Add webhook endpoint in Stripe Dashboard → Developers → Webhooks
  *      URL: https://values.caronomist.com/api/webhooks/stripe
@@ -26,6 +26,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { isBillingEnabled } from "@/lib/billing";
 import { writeFile, readFile, appendFile } from "fs/promises";
 import path from "path";
 
@@ -36,7 +37,7 @@ const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? "";
 const DATABASE_URL = process.env.DATABASE_URL ?? "";
 
 // Stripe price ID → member tier mapping
-// George: populate these with your actual Stripe price IDs after T-131
+// Populate these with Stripe price IDs when billing is enabled (T-131)
 const PRICE_TIER_MAP: Record<string, { tier: "pro" | "pro_plus"; interval: "monthly" | "yearly" }> = {
   [process.env.STRIPE_PRICE_PRO_MONTHLY ?? "price_pro_monthly"]: { tier: "pro", interval: "monthly" },
   [process.env.STRIPE_PRICE_PRO_YEARLY ?? "price_pro_yearly"]: { tier: "pro", interval: "yearly" },
@@ -456,7 +457,7 @@ async function handleChargeDispute(
   });
 
   // Escalate to console (Orion monitoring will surface this)
-  // TODO: Add Telegram alert to George when this fires (rare, needs immediate review)
+  // TODO: Alert an operator when this fires (rare, needs immediate review)
   console.error(
     `[webhook] ⚠️ CHARGEBACK — ${email ?? customerId ?? chargeId} | dispute ${dispute.id} | $${(dispute.amount / 100).toFixed(2)} | reason: ${dispute.reason}`
   );
@@ -465,6 +466,10 @@ async function handleChargeDispute(
 // ─── Main route handler ─────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
+  if (!isBillingEnabled()) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   // 1. Signature verification
   if (!STRIPE_WEBHOOK_SECRET) {
     console.error("[webhook] STRIPE_WEBHOOK_SECRET not set — rejecting all events");

@@ -27,6 +27,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { isBillingEnabled } from "@/lib/billing";
 import { UpsellCTA, UpsellVariant } from "./UpsellCTA";
 
 export type AccessTier = "none" | "free" | "pro" | "pro+";
@@ -157,6 +158,14 @@ export function TierGate({
 
   if (hasAccess) {
     return <>{children}</>;
+  }
+
+  if (!isBillingEnabled() && requiredTier !== "free") {
+    return (
+      <p className="my-4 text-center text-sm text-slate-500">
+        This feature is not available yet.
+      </p>
+    );
   }
 
   if (blurFallback) {

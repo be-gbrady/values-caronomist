@@ -3,6 +3,8 @@
 // Postmark API: https://postmarkapp.com/developer/api/overview
 // Env vars required: POSTMARK_SERVER_TOKEN, POSTMARK_FROM_EMAIL
 
+import { isBillingEnabled } from "@/lib/billing";
+
 export type EmailTemplate =
   | "welcome"
   | "day7-upsell"
@@ -40,7 +42,20 @@ export interface SendResult {
   ok: boolean;
   messageId?: string;
   error?: string;
-  provider: "postmark" | "local-fallback";
+  /** True when a paid-plan template was not sent because billing is disabled. */
+  suppressed?: boolean;
+  provider: "postmark" | "local-fallback" | "suppressed";
+}
+
+const PAID_BILLING_TEMPLATES = new Set<EmailTemplate>([
+  "day7-upsell",
+  "day30-upsell",
+  "pro-upgrade",
+  "churn-risk",
+]);
+
+export function isPaidBillingTemplate(template: EmailTemplate): boolean {
+  return PAID_BILLING_TEMPLATES.has(template);
 }
 
 // ─── Config ────────────────────────────────────────────────────────────────
@@ -106,12 +121,16 @@ function welcomeEmail(ctx: EmailContext): PostmarkMessage {
   const name = ctx.toName ? `, ${ctx.toName}` : "";
   const subject = "You've unlocked the Caronomist ranking";
 
+  const accessLine = isBillingEnabled()
+    ? "All 21 ranked models, BaT median values, Caronomist Score breakdown, and collector demand signals — free, no credit card required."
+    : "All 21 ranked models, BaT median values, Caronomist Score breakdown, and collector demand signals.";
+
   const html = htmlWrapper(
     subject,
     `<h1>The full ranking is yours${name}</h1>
     <p>Welcome to Caronomist — the collector car data platform that puts hard numbers behind the cars people actually want.</p>
     <div class="highlight">
-      <p><strong>What you've unlocked:</strong> All 21 ranked models, BaT median values, Caronomist Score breakdown, and collector demand signals — free, no credit card required.</p>
+      <p><strong>What you've unlocked:</strong> ${accessLine}</p>
     </div>
     <p>A few things worth exploring right away:</p>
     <ul>
@@ -125,7 +144,7 @@ function welcomeEmail(ctx: EmailContext): PostmarkMessage {
 
   const text = `Welcome to Caronomist${name}
 
-You've unlocked the full ranking — all 21 models with BaT medians, Caronomist Scores, and collector demand signals.
+You've unlocked the full ranking — ${accessLine}
 
 Explore now: ${BASE_URL}/ranking
 
@@ -315,7 +334,11 @@ function monthlyNewsletterEmail(ctx: EmailContext): PostmarkMessage {
       <li><strong>The Caronomist Take</strong> — one model, deep-dive, no hedging</li>
     </ul>
     <a class="cta" href="${BASE_URL}/newsletter/${month.toLowerCase().replace(" ", "-")}">Read the Full Briefing →</a>
-    <p>This is your monthly Pro briefing. If you want quarterly white papers and deeper research, <a href="${BASE_URL}/pro-plus" style="color:#f59e0b;">Pro+ includes both</a>.</p>`
+    ${
+      isBillingEnabled()
+        ? `<p>This is your monthly Pro briefing. If you want quarterly white papers and deeper research, <a href="${BASE_URL}/pro-plus" style="color:#f59e0b;">Pro+ includes both</a>.</p>`
+        : ""
+    }`
   );
 
   const text = `Caronomist | ${month} — Market Shifts, Movers, and What's Next${name}
@@ -328,9 +351,11 @@ Inside this month:
 - Demand Signal Update: BaT sell-through rates + days-to-sell across 21 models
 - The Caronomist Take: one model, deep-dive, no hedging
 
-Read the full briefing: ${BASE_URL}/newsletter/${month.toLowerCase().replace(" ", "-")}
-
-Want quarterly white papers? Upgrade to Pro+: ${BASE_URL}/pro-plus${footer()}`;
+Read the full briefing: ${BASE_URL}/newsletter/${month.toLowerCase().replace(" ", "-")}${
+    isBillingEnabled()
+      ? `\n\nWant quarterly white papers? Upgrade to Pro+: ${BASE_URL}/pro-plus`
+      : ""
+  }${footer()}`;
 
   return {
     From: FROM_EMAIL,
@@ -428,6 +453,10 @@ export async function sendEmail(
   template: EmailTemplate,
   ctx: EmailContext
 ): Promise<SendResult> {
+  if (!isBillingEnabled() && isPaidBillingTemplate(template)) {
+    return { ok: true, suppressed: true, provider: "suppressed" };
+  }
+
   const message = buildEmailMessage(template, ctx);
 
   if (!POSTMARK_SERVER_TOKEN) {
@@ -472,6 +501,10 @@ export async function sendBatchEmail(
   template: EmailTemplate,
   recipients: EmailContext[]
 ): Promise<{ sent: number; failed: number; errors: string[] }> {
+  if (!isBillingEnabled() && isPaidBillingTemplate(template)) {
+    return { sent: 0, failed: 0, errors: [] };
+  }
+
   if (!POSTMARK_SERVER_TOKEN) {
     console.log(`[email] Batch send ${recipients.length} to ${template} (dev mode)`);
     return { sent: recipients.length, failed: 0, errors: [] };
