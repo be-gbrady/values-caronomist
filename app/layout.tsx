@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { CANONICAL_ORIGIN } from "@/lib/site";
+import { publicSiteUrl } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(CANONICAL_ORIGIN),
+  metadataBase: new URL(publicSiteUrl()),
   title: "The Caronomist — Enthusiast Vehicle Rankings",
   description:
     "The most comprehensive ranking of collector and enthusiast vehicles (1968–2013). Data-driven scores across appreciation, heritage, liquidity, performance, cost of ownership, and upgradability.",

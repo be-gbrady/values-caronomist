@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { isBillingEnabled } from "@/lib/billing";
+import { publicSiteUrl } from "@/lib/site";
+
+const siteHost = new URL(publicSiteUrl()).host;
 
 interface FunnelData {
   visitors: number;
@@ -289,7 +292,7 @@ export default function AnalyticsDashboard() {
 
       {/* Footer note */}
       <p style={{ fontSize: "0.72rem", color: "#334155", marginTop: "1.5rem", textAlign: "center" }}>
-        Admin access only · values.caronomist.com internal dashboard · Data stored in data/analytics-events.json · Migrate to Neon when T-131 complete
+        Admin access only · {siteHost} internal dashboard · Data stored in data/analytics-events.json · Migrate to Neon when T-131 complete
       </p>
     </div>
   );

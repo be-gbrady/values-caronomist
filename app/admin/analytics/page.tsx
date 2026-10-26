@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import { publicSiteUrl } from "@/lib/site";
+
+const siteHost = new URL(publicSiteUrl()).host;
 
 // Admin gate: reads localStorage "caronomist_admin" key
 // In production, replace with Memberstack admin plan check or server session cookie
@@ -55,7 +58,7 @@ export default function AdminAnalyticsPage() {
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
             <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🔐</div>
             <h2 style={{ margin: 0, color: "#F7C948", fontSize: "1.25rem" }}>Admin Access</h2>
-            <p style={{ margin: "0.5rem 0 0", color: "#64748b", fontSize: "0.85rem" }}>values.caronomist.com · Internal Dashboard</p>
+            <p style={{ margin: "0.5rem 0 0", color: "#64748b", fontSize: "0.85rem" }}>{siteHost} · Internal Dashboard</p>
           </div>
           <form onSubmit={handleLogin}>
             <input

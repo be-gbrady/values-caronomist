@@ -4,6 +4,7 @@
 // Env vars required: POSTMARK_SERVER_TOKEN, POSTMARK_FROM_EMAIL
 
 import { isBillingEnabled } from "@/lib/billing";
+import { publicSiteUrl } from "@/lib/site";
 
 export type EmailTemplate =
   | "welcome"
@@ -61,7 +62,7 @@ export function isPaidBillingTemplate(template: EmailTemplate): boolean {
 // ─── Config ────────────────────────────────────────────────────────────────
 const POSTMARK_SERVER_TOKEN = process.env.POSTMARK_SERVER_TOKEN ?? "";
 const FROM_EMAIL = process.env.POSTMARK_FROM_EMAIL ?? "hello@caronomist.com";
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://values.caronomist.com";
+const BASE_URL = publicSiteUrl();
 const UNSUBSCRIBE_URL = `${BASE_URL}/unsubscribe`;
 const PRO_UPGRADE_URL = `${BASE_URL}/upgrade`;
 

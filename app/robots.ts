@@ -1,14 +1,15 @@
 import type { MetadataRoute } from "next";
-import { CANONICAL_ORIGIN } from "@/lib/site";
+import { resolvePublicSiteUrl, ROBOTS_DISALLOW } from "@/lib/site";
 
-export default function robots(): MetadataRoute.Robots {
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const origin = await resolvePublicSiteUrl();
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin", "/api", "/checkout"],
+      disallow: [...ROBOTS_DISALLOW],
     },
-    sitemap: `${CANONICAL_ORIGIN}/sitemap.xml`,
-    host: CANONICAL_ORIGIN,
+    sitemap: `${origin}/sitemap.xml`,
+    host: origin,
   };
 }
