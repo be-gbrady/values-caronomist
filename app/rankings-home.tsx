@@ -14,6 +14,15 @@ import {
 import { EmailCaptureGate, getFreeEmailFromStorage } from "../components/EmailCaptureGate";
 import { TierGate } from "../components/TierGate";
 import { isBillingEnabled } from "../lib/billing";
+import {
+  buyerAnswer,
+  formatUtcDate,
+  rankingAsOfDate,
+  READER_QUESTION,
+  siteDefinition,
+  SITE_PUBLISHED_DATE,
+} from "../lib/readerCopy";
+import { modelCodeToSlug } from "../lib/vehicleData";
 
 const SLICE_LABELS: Record<string, string> = {
   appreciation_focus: "Appreciation",
@@ -121,9 +130,14 @@ function RankRow({
           <MakeIcon make={model.make} />
           <div>
             <div className="flex items-center text-sm font-semibold text-white">
-              {model.make === "BMW"
-                ? `${model.generation} ${model.model}`
-                : `${model.model} (${model.generation})`}
+              <a
+                href={`/vehicles/${modelCodeToSlug(model.modelCode)}`}
+                className="hover:text-yellow-300"
+              >
+                {model.make === "BMW"
+                  ? `${model.generation} ${model.model}`
+                  : `${model.model} (${model.generation})`}
+              </a>
               {model.homologation && <HomologationBadge />}
             </div>
             <div className="text-xs text-slate-500">{model.yearRange}</div>
@@ -164,16 +178,13 @@ function RankRow({
       <td className="hidden py-3 pr-4 lg:table-cell">
         <ScoreBar score={model.dimensionScores.performance} />
       </td>
-      {/* Detail link */}
       <td className="py-3 pr-4 text-right">
-        {!blurred && (
-          <a
-            href={`/vehicles/${model.modelCode.toLowerCase()}`}
-            className="text-xs text-yellow-400 hover:text-yellow-300 transition-colors font-medium"
-          >
-            Details →
-          </a>
-        )}
+        <a
+          href={`/vehicles/${modelCodeToSlug(model.modelCode)}`}
+          className="text-xs text-yellow-400 hover:text-yellow-300 transition-colors font-medium"
+        >
+          Details
+        </a>
       </td>
     </tr>
   );
@@ -190,9 +201,14 @@ function SliceRow({ entry, index }: { entry: SliceEntry; index: number }) {
       <MakeIcon make={model.make} />
       <div className="flex-1">
         <div className="text-sm font-medium text-white">
-          {model.make === "BMW"
-            ? `${model.generation} ${model.model}`
-            : `${model.model} (${model.generation})`}
+          <a
+            href={`/vehicles/${modelCodeToSlug(model.modelCode)}`}
+            className="hover:text-yellow-300"
+          >
+            {model.make === "BMW"
+              ? `${model.generation} ${model.model}`
+              : `${model.model} (${model.generation})`}
+          </a>
         </div>
         <div className="text-xs text-slate-500">{model.yearRange}</div>
       </div>
@@ -227,11 +243,12 @@ export default function Home() {
         className="border-b"
         style={{ borderColor: "rgba(247,201,72,0.15)", background: "#091829" }}
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-          <div className="flex items-center gap-3">
+        <nav aria-label="Primary" className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+          <a href="/" className="flex items-center gap-3">
             <div
               className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-black"
               style={{ background: "#F7C948", color: "#0B1F3B" }}
+              aria-hidden="true"
             >
               C
             </div>
@@ -243,13 +260,19 @@ export default function Home() {
                 Enthusiast Vehicle Intelligence
               </div>
             </div>
-          </div>
+          </a>
 
           <div className="flex items-center gap-3">
+            <a href="/methodology" className="text-xs text-slate-400 hover:text-white">
+              Methodology
+            </a>
+            <a href="/privacy" className="text-xs text-slate-400 hover:text-white">
+              Privacy
+            </a>
             <span
               className="hidden text-xs text-slate-500 sm:block"
             >
-              {META.model_count} models · Phase 0 · {new Date(META.computed_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              {META.model_count} models · Phase 0 · <time dateTime={rankingAsOfDate()}>{formatUtcDate(rankingAsOfDate())}</time>
             </span>
             {isBillingEnabled() && (
               <button
@@ -261,18 +284,23 @@ export default function Home() {
               </button>
             )}
           </div>
-        </div>
+        </nav>
       </header>
 
+      <main>
       {/* Hero */}
       <div className="mx-auto max-w-7xl px-4 pt-10 pb-6">
         <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl">
           Enthusiast Vehicle Rankings
         </h1>
-        <p className="mt-2 max-w-2xl text-slate-400">
-          A 100-point composite score across appreciation trajectory, heritage,
-          liquidity, cost of ownership, performance, and community strength. 
-          {" "}<span className="text-yellow-400 font-medium">Phase 0 · {META.model_count} models.</span>
+        <p className="mt-2 max-w-2xl text-slate-300">
+          {siteDefinition()}
+        </p>
+        <h2 className="mt-6 text-xl font-bold text-white">
+          {READER_QUESTION}
+        </h2>
+        <p className="mt-2 max-w-2xl text-slate-300">
+          {buyerAnswer()}
         </p>
 
         {/* Score dimension legend */}
@@ -305,6 +333,8 @@ export default function Home() {
           ].map((tab) => (
             <button
               key={tab.key}
+              type="button"
+              aria-pressed={activeTab === tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`shrink-0 px-4 py-3 text-sm font-medium transition-colors ${
                 activeTab === tab.key ? "tab-active" : "tab-inactive"
@@ -404,17 +434,25 @@ export default function Home() {
         )}
 
         {/* Footnote */}
-        <div className="mt-8 flex flex-wrap gap-4 text-xs text-slate-600">
-          <span>Data as of {new Date(META.computed_at).toLocaleDateString()}</span>
+        <div className="mt-8 flex flex-wrap gap-4 text-xs text-slate-400">
+          <span>
+            Data as of <time dateTime={rankingAsOfDate()}>{formatUtcDate(rankingAsOfDate())}</time>
+          </span>
+          <span>·</span>
+          <span>
+            Updated <time dateTime={rankingAsOfDate()}>{formatUtcDate(rankingAsOfDate())}</time>
+          </span>
+          <span>·</span>
+          <span>
+            Published <time dateTime={SITE_PUBLISHED_DATE}>{formatUtcDate(SITE_PUBLISHED_DATE)}</time>
+          </span>
           <span>·</span>
           <span>Scoring v{META.scoring_version}</span>
           <span>·</span>
-          <span>
-            Official values: Hagerty, BaT, Classic.com medians. Unofficial pipeline
-            coming Q2 2026.
-          </span>
+          <span>Official values: Hagerty, Bring a Trailer, and Classic.com medians.</span>
         </div>
       </div>
+      </main>
 
       <footer
         className="border-t py-8"
@@ -442,11 +480,13 @@ export default function Home() {
             </div>
           )}
           <div
-            className={`text-xs text-slate-600 ${
+            className={`flex flex-wrap gap-4 text-xs text-slate-600 ${
               isBillingEnabled() ? "border-t border-white/5 pt-4" : ""
             }`}
           >
-            © 2026 Caronomist
+            <span>© 2026 Caronomist</span>
+            <a href="/methodology" className="hover:text-slate-300">Methodology</a>
+            <a href="/privacy" className="hover:text-slate-300">Privacy</a>
           </div>
         </div>
       </footer>

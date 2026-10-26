@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { siteDefinition } from "@/lib/readerCopy";
 import { publicSiteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -11,11 +12,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(publicSiteUrl()),
   title: "The Caronomist — Enthusiast Vehicle Rankings",
-  description:
-    "The most comprehensive ranking of collector and enthusiast vehicles (1968–2013). Data-driven scores across appreciation, heritage, liquidity, performance, cost of ownership, and upgradability.",
+  description: siteDefinition(),
   openGraph: {
     title: "The Caronomist — Enthusiast Vehicle Rankings",
-    description: "Data-driven rankings for collector and enthusiast vehicles.",
+    description: siteDefinition(),
     siteName: "The Caronomist",
     type: "website",
   },

@@ -61,11 +61,16 @@ export default function AdminAnalyticsPage() {
             <p style={{ margin: "0.5rem 0 0", color: "#64748b", fontSize: "0.85rem" }}>{siteHost} · Internal Dashboard</p>
           </div>
           <form onSubmit={handleLogin}>
+            <label htmlFor="admin-password" className="sr-only">
+              Admin password
+            </label>
             <input
+              id="admin-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Admin password"
+              autoComplete="current-password"
               style={{
                 width: "100%",
                 padding: "0.75rem",

@@ -4,6 +4,15 @@
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
+import {
+  formatUtcDate,
+  modelLabel,
+  rankingAsOfDate,
+  SITE_PUBLISHED_DATE,
+  vehicleStructuredData,
+} from "@/lib/readerCopy";
+import { publicSiteUrl } from "@/lib/site";
 import {
   getVehicleDetail,
   getAllVehicleDetails,
@@ -118,26 +127,33 @@ export default async function VehicleDetailPage({
   const { ranking, officialValue, price_bands, price_range } = vehicle;
   const mv = officialValue.weighted_official;
 
-  return (
-    <main className="min-h-screen bg-[#0B1F3B] text-white">
-      {/* ── Nav ── */}
-      <nav className="border-b border-slate-700 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="text-yellow-400 font-bold text-lg tracking-tight">
-          CARONOMIST VALUES
-        </Link>
-        <div className="flex gap-6 text-sm text-slate-400">
-          <Link href="/" className="hover:text-white transition-colors">
-            Rankings
-          </Link>
-          <Link href="/pro/portfolio" className="hover:text-white transition-colors">
-            Portfolio
-          </Link>
-          <Link href="/pro/alerts" className="hover:text-white transition-colors">
-            Alerts
-          </Link>
-        </div>
-      </nav>
+  const asOf = officialValue.as_of || rankingAsOfDate();
+  const vehicleName = modelLabel(vehicle);
+  const worthAnswer = `As of ${formatUtcDate(asOf)}, the tracked price range for the ${vehicleName} is ${formatCurrency(price_range.low)} to ${formatCurrency(price_range.high)}.`;
 
+  return (
+    <div className="min-h-screen bg-[#0B1F3B] text-white">
+      <JsonLd data={vehicleStructuredData(publicSiteUrl(), vehicle)} />
+      <header>
+        <nav aria-label="Primary" className="border-b border-slate-700 px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="text-yellow-400 font-bold text-lg tracking-tight">
+            CARONOMIST VALUES
+          </Link>
+          <div className="flex gap-6 text-sm text-slate-400">
+            <Link href="/" className="hover:text-white transition-colors">
+              Rankings
+            </Link>
+            <Link href="/methodology" className="hover:text-white transition-colors">
+              Methodology
+            </Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">
+              Privacy
+            </Link>
+          </div>
+        </nav>
+      </header>
+
+      <main>
       <div className="max-w-4xl mx-auto px-6 py-10 space-y-10">
 
         {/* ── Header ── */}
@@ -154,10 +170,10 @@ export default async function VehicleDetailPage({
               )}
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-white">
-              {vehicle.make} {vehicle.model}
+              {`${vehicleName} value and buyer's guide`}
             </h1>
             <p className="text-xl text-slate-300 mt-1">
-              {vehicle.generation} · {vehicle.yearRange}
+              {vehicle.yearRange}
             </p>
             <p className="text-slate-400 text-sm mt-3 max-w-xl leading-relaxed">
               {vehicle.notes}
@@ -173,9 +189,21 @@ export default async function VehicleDetailPage({
             </div>
             <div className="mt-3 text-xs text-slate-500">
               Overall Score: <span className="text-white font-semibold">{ranking.overallScore}</span>/100
+              {" · "}
+              Updated <time dateTime={asOf}>{formatUtcDate(asOf)}</time>
             </div>
           </div>
         </div>
+
+        <section>
+          <h2 className="text-lg font-semibold text-yellow-400 mb-3">
+            What is a {vehicleName} worth today?
+          </h2>
+          <p className="text-slate-200">{worthAnswer}</p>
+          <p className="text-xs text-slate-500 mt-2">
+            Published <time dateTime={SITE_PUBLISHED_DATE}>{formatUtcDate(SITE_PUBLISHED_DATE)}</time>
+          </p>
+        </section>
 
         {/* ── Price Bands ── */}
         <section>
@@ -209,7 +237,7 @@ export default async function VehicleDetailPage({
           </div>
           <p className="text-xs text-slate-500 mt-3">
             Range: {formatCurrency(price_range.low)} – {formatCurrency(price_range.high)} · As of{" "}
-            {officialValue.as_of}
+            <time dateTime={asOf}>{formatUtcDate(asOf)}</time>
           </p>
         </section>
 
@@ -218,6 +246,9 @@ export default async function VehicleDetailPage({
           <h2 className="text-lg font-semibold text-yellow-400 mb-4">
             Caronomist Ranking Scores
           </h2>
+          <p className="text-xs text-slate-500 mb-4">
+            Scores as of <time dateTime={rankingAsOfDate()}>{formatUtcDate(rankingAsOfDate())}</time>
+          </p>
           <div className="bg-slate-800 rounded-lg p-5 grid sm:grid-cols-2 gap-4">
             <ScoreBar label="Appreciation Potential" score={ranking.dimensionScores.appreciation} />
             <ScoreBar label="Heritage & Provenance" score={ranking.dimensionScores.heritage} />
@@ -424,6 +455,15 @@ export default async function VehicleDetailPage({
           </Link>
         </div>
       </div>
-    </main>
+      </main>
+      <footer className="border-t border-slate-700 px-6 py-8 text-xs text-slate-500">
+        <div className="max-w-4xl mx-auto flex flex-wrap gap-4">
+          <span>© 2026 Caronomist</span>
+          <Link href="/" className="hover:text-white">Rankings</Link>
+          <Link href="/methodology" className="hover:text-white">Methodology</Link>
+          <Link href="/privacy" className="hover:text-white">Privacy</Link>
+        </div>
+      </footer>
+    </div>
   );
 }

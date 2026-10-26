@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { homeStructuredData } from "@/lib/readerCopy";
+import { publicSiteUrl } from "@/lib/site";
 import Home from "./rankings-home";
 
 export const metadata: Metadata = {
@@ -14,5 +17,10 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <Home />;
+  return (
+    <>
+      <JsonLd data={homeStructuredData(publicSiteUrl())} />
+      <Home />
+    </>
+  );
 }

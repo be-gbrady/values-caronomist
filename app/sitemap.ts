@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { META, OVERALL_RANKING } from "@/lib/rankingData";
+import { rankingAsOfDate } from "@/lib/readerCopy";
 import { resolvePublicSiteUrl } from "@/lib/site";
 import { getVehicleDetail, modelCodeToSlug } from "@/lib/vehicleData";
 
@@ -26,6 +27,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified,
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${origin}/methodology`,
+      lastModified: new Date(rankingAsOfDate()),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${origin}/privacy`,
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
     ...vehicles,
   ];
