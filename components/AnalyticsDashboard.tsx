@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { isBillingEnabled } from "@/lib/billing";
+import { publicSiteUrl } from "@/lib/site";
+
+const siteHost = new URL(publicSiteUrl()).host;
 
 interface FunnelData {
   visitors: number;
@@ -168,7 +172,10 @@ export default function AnalyticsDashboard() {
       {activeTab === "overview" && (
         <div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "1rem", marginBottom: "1.5rem" }}>
-            {METRIC_CARD_DEFS.map(({ key, label, icon, color }) => (
+            {(isBillingEnabled()
+              ? METRIC_CARD_DEFS
+              : METRIC_CARD_DEFS.filter((card) => card.key !== "upgradeClicks")
+            ).map(({ key, label, icon, color }) => (
               <div key={key} style={{
                 background: "#0f172a",
                 border: `1px solid ${color}33`,
@@ -193,18 +200,22 @@ export default function AnalyticsDashboard() {
                 </div>
                 <div style={{ fontSize: "0.75rem", color: "#64748b" }}>Email capture rate</div>
               </div>
-              <div>
-                <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#a78bfa" }}>
-                  {metrics.emailCaptures > 0 ? ((metrics.upgradeClicks / metrics.emailCaptures) * 100).toFixed(1) : "0.0"}%
+              {isBillingEnabled() && (
+                <div>
+                  <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#a78bfa" }}>
+                    {metrics.emailCaptures > 0 ? ((metrics.upgradeClicks / metrics.emailCaptures) * 100).toFixed(1) : "0.0"}%
+                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "#64748b" }}>Free → upgrade click</div>
                 </div>
-                <div style={{ fontSize: "0.75rem", color: "#64748b" }}>Free → upgrade click</div>
-              </div>
-              <div>
-                <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#F7C948" }}>
-                  {metrics.funnel.upgradeClick > 0 ? ((metrics.funnel.proConversions / metrics.funnel.upgradeClick) * 100).toFixed(1) : "0.0"}%
+              )}
+              {isBillingEnabled() && (
+                <div>
+                  <div style={{ fontSize: "1.4rem", fontWeight: 700, color: "#F7C948" }}>
+                    {metrics.funnel.upgradeClick > 0 ? ((metrics.funnel.proConversions / metrics.funnel.upgradeClick) * 100).toFixed(1) : "0.0"}%
+                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "#64748b" }}>Click → paid (needs Memberstack)</div>
                 </div>
-                <div style={{ fontSize: "0.75rem", color: "#64748b" }}>Click → paid (needs Memberstack)</div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -216,11 +227,15 @@ export default function AnalyticsDashboard() {
           <h3 style={{ margin: "0 0 1.25rem", fontSize: "0.9rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>Conversion Funnel</h3>
           <FunnelBar label="Visitors (page views)" value={metrics.funnel.visitors} max={funnelMax} color="#60a5fa" />
           <FunnelBar label="Email captured (free tier)" value={metrics.funnel.emailCaptured} max={funnelMax} color="#34d399" />
-          <FunnelBar label="Upgrade clicked (Pro/Pro+)" value={metrics.funnel.upgradeClick} max={funnelMax} color="#a78bfa" />
-          <FunnelBar label="Paid conversions (Memberstack — pending)" value={metrics.funnel.proConversions} max={funnelMax} color="#F7C948" />
-          <p style={{ fontSize: "0.75rem", color: "#475569", marginTop: "1rem" }}>
-            Pro conversions = 0 until Memberstack webhook is wired (T-131). Once George creates Memberstack account, Kion wires the webhook → events auto-populate.
-          </p>
+          {isBillingEnabled() && (
+            <>
+              <FunnelBar label="Upgrade clicked (Pro/Pro+)" value={metrics.funnel.upgradeClick} max={funnelMax} color="#a78bfa" />
+              <FunnelBar label="Paid conversions (Memberstack — pending)" value={metrics.funnel.proConversions} max={funnelMax} color="#F7C948" />
+              <p style={{ fontSize: "0.75rem", color: "#475569", marginTop: "1rem" }}>
+                Paid conversions stay at 0 until the membership webhook is connected.
+              </p>
+            </>
+          )}
         </div>
       )}
 
@@ -277,7 +292,7 @@ export default function AnalyticsDashboard() {
 
       {/* Footer note */}
       <p style={{ fontSize: "0.72rem", color: "#334155", marginTop: "1.5rem", textAlign: "center" }}>
-        Admin access only · values.caronomist.com internal dashboard · Data stored in data/analytics-events.json · Migrate to Neon when T-131 complete
+        Admin access only · {siteHost} internal dashboard · Data stored in data/analytics-events.json · Migrate to Neon when T-131 complete
       </p>
     </div>
   );

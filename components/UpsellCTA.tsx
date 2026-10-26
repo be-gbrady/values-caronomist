@@ -1,5 +1,7 @@
 "use client";
 
+import { isBillingEnabled } from "@/lib/billing";
+
 /**
  * UpsellCTA — Contextual upsell prompt for locked content
  *
@@ -101,7 +103,7 @@ const COPY: Record<UpsellVariant, Omit<UpsellCopy, "price" | "cta" | "checkoutPa
   "white-paper": {
     label: "Pro+ Feature",
     headline: "Quarterly research brief",
-    body: "Deep-dive white papers on market movements, emerging appreciators, and George's top picks each quarter.",
+    body: "Deep-dive white papers on market movements, emerging appreciators, and editorial top picks each quarter.",
   },
   "full-ranking": {
     label: "Free Access",
@@ -130,6 +132,8 @@ const TIER_CONFIG: Record<"pro" | "pro+", { price: string; cta: string; checkout
 // ---------------------------------------------------------------------------
 
 export function UpsellCTA({ variant, requiredTier, compact = false }: UpsellCTAProps) {
+  // Paid plans are hidden until billing is explicitly enabled.
+  if (!isBillingEnabled()) return null;
   // "free" tier upsell means email gate — shouldn't reach here, but handle gracefully
   if (requiredTier === "free") return null;
 

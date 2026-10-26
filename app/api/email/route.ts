@@ -84,6 +84,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const result = await sendEmail(template, ctx);
 
+  if (result.suppressed) {
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      reason: "billing disabled",
+      template,
+      to: ctx.toEmail,
+    });
+  }
+
   if (!result.ok) {
     console.error("[email/route] send failed:", result.error);
     return NextResponse.json(

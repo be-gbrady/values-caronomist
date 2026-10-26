@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { OVERALL_RANKING } from "@/lib/rankingData";
+import { publicSiteUrl } from "@/lib/site";
 import fs from "fs";
 import path from "path";
 
@@ -188,7 +189,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
           dataset,
           generated_at: new Date().toISOString(),
           record_count: rows.length,
-          source: "values.caronomist.com",
+          source: new URL(publicSiteUrl()).host,
         },
         data: rows,
       },

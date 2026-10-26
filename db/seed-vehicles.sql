@@ -1,5 +1,5 @@
 -- Caronomist Values — Seed Data (Phase 0 SPI Vehicles)
--- Source: Brady Enterprises Street Price Index snapshots (March–April 2026)
+-- Source: Caronomist Street Price Index snapshots (March–April 2026)
 -- All valuation data sourced from BaT, Classic.com, web_search — verified real data
 -- DO NOT include in production without final editorial review
 
@@ -77,7 +77,7 @@ JOIN (VALUES
   ('HONDA-S2000-AP1',     'BaT/Classic.com', 20000,  65000,  NULL,    35000,  0.70, 'AP1 commands premium over AP2. Clean low-mileage examples increasingly rare.'),
   ('MB-W124',             'BaT/Classic.com', 5000,   40000,  20000,   18000,  0.75, 'E500 (W124) and 500E most collectible. Diesel versions growing. BaT 2025 data.'),
   ('MB-W126',             'BaT/Classic.com', 8000,   45000,  18000,   15000,  0.70, '560SEL most sought-after. Low-mileage, documented examples command significant premium.'),
-  ('MB-W140',             'BaT/Classic.com', 5000,   35000,  15000,   14000,  0.80, 'S600 V12 and AMG versions at major premium. George's example (S500 6.0, 37K) well above median.'),
+  ('MB-W140',             'BaT/Classic.com', 5000,   35000,  15000,   14000,  0.80, 'S600 V12 and AMG versions at major premium. Low-mileage S500 examples can trade above the median.'),
   ('MB-R107',             'BaT/Classic.com', 12000,  65000,  27000,   25000,  0.75, '560SL most popular. Low-mileage originals commanding strong prices. BaT 2025 confirmed.')
 ) AS spi(model_code, source, price_low, price_high, median, fair_value, confidence, reasoning)
 ON v.model_code = spi.model_code;

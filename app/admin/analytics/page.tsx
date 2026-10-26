@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import { publicSiteUrl } from "@/lib/site";
+
+const siteHost = new URL(publicSiteUrl()).host;
 
 // Admin gate: reads localStorage "caronomist_admin" key
 // In production, replace with Memberstack admin plan check or server session cookie
@@ -10,7 +13,7 @@ export default function AdminAnalyticsPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const ADMIN_KEY = process.env.NEXT_PUBLIC_ADMIN_KEY || "brady2026";
+  const adminKey = process.env.NEXT_PUBLIC_ADMIN_KEY;
 
   useEffect(() => {
     const stored = typeof window !== "undefined" && localStorage.getItem("caronomist_admin");
@@ -19,12 +22,12 @@ export default function AdminAnalyticsPage() {
 
   function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (password === ADMIN_KEY) {
+    if (adminKey && password === adminKey) {
       localStorage.setItem("caronomist_admin", "true");
       setIsAdmin(true);
       setError("");
     } else {
-      setError("Incorrect password.");
+      setError(adminKey ? "Incorrect password." : "Admin access is not configured.");
     }
   }
 
@@ -55,7 +58,7 @@ export default function AdminAnalyticsPage() {
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
             <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🔐</div>
             <h2 style={{ margin: 0, color: "#F7C948", fontSize: "1.25rem" }}>Admin Access</h2>
-            <p style={{ margin: "0.5rem 0 0", color: "#64748b", fontSize: "0.85rem" }}>values.caronomist.com · Internal Dashboard</p>
+            <p style={{ margin: "0.5rem 0 0", color: "#64748b", fontSize: "0.85rem" }}>{siteHost} · Internal Dashboard</p>
           </div>
           <form onSubmit={handleLogin}>
             <input
@@ -94,8 +97,8 @@ export default function AdminAnalyticsPage() {
             </button>
           </form>
           <p style={{ textAlign: "center", fontSize: "0.72rem", color: "#334155", marginTop: "1.25rem" }}>
-            Set NEXT_PUBLIC_ADMIN_KEY env var before production deploy.<br />
-            Replace with Memberstack admin plan for multi-user access.
+            Admin access requires NEXT_PUBLIC_ADMIN_KEY.<br />
+            Replace with a server-side session check before production use.
           </p>
         </div>
       </div>

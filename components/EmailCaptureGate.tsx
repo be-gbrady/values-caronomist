@@ -19,6 +19,7 @@
  */
 
 import { useState } from "react";
+import { isBillingEnabled } from "@/lib/billing";
 
 interface EmailCaptureGateProps {
   onUnlock: (email: string) => void;
@@ -109,7 +110,8 @@ export function EmailCaptureGate({
         {/* Sub-copy */}
         <p className="mb-6 text-sm text-slate-400">
           Enter your email for free access to the complete ranking, trend
-          signals, and market values. No credit card required.
+          signals, and market values.
+          {isBillingEnabled() ? " No credit card required." : ""}
         </p>
 
         {/* Form */}
@@ -147,8 +149,8 @@ export function EmailCaptureGate({
 
         {/* Fine print */}
         <p className="mt-3 text-xs text-slate-600">
-          No spam. Unsubscribe anytime. Pro plan unlocks sub-scores &amp;
-          alerts.
+          No spam. Unsubscribe anytime.
+          {isBillingEnabled() ? " Pro plan unlocks sub-scores and alerts." : ""}
         </p>
       </div>
     </div>
