@@ -119,12 +119,17 @@ export function EmailCaptureGate({
           onSubmit={handleSubmit}
           className="flex flex-col gap-3 sm:flex-row"
         >
+          <label htmlFor="gate-email" className="sr-only">
+            Email address
+          </label>
           <input
+            id="gate-email"
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
+            autoComplete="email"
             disabled={submitting}
             className="flex-1 rounded-lg px-4 py-3 text-sm text-white outline-none disabled:opacity-60"
             style={{
