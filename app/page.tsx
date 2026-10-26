@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   openGraph: {
     url: "/",
   },
+  verification: {
+    google: "UmK-6qp6RuEo2vKYZQ--cG_irbuh1iIph2ElV58M4VQ",
+  },
 };
 
 export default function Page() {
